@@ -22,14 +22,16 @@
     </el-descriptions>
   </Dialog>
 </template>
-<script lang="ts" name="MyNotifyMessageDetailDetail" setup>
+<script lang="ts" setup>
 import { DICT_TYPE } from '@/utils/dict'
 import { formatDate } from '@/utils/formatTime'
 import * as NotifyMessageApi from '@/api/system/notify/message'
 
+defineOptions({ name: 'MyNotifyMessageDetailDetail' })
+
 const dialogVisible = ref(false) // 弹窗的是否展示
 const detailLoading = ref(false) // 表单的加载中
-const detailData = ref() // 详情数据
+const detailData = ref({} as NotifyMessageApi.NotifyMessageVO) // 详情数据
 
 /** 打开弹窗 */
 const open = async (data: NotifyMessageApi.NotifyMessageVO) => {

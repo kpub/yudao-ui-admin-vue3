@@ -1,4 +1,6 @@
 <template>
+  <doc-alert title="商城手册（功能开启）" url="https://doc.iocoder.cn/mall/build/" />
+
   <!-- 搜索工作栏 -->
   <ContentWrap>
     <el-form
@@ -59,7 +61,7 @@
       <el-table-column label="品牌名称" prop="name" sortable />
       <el-table-column label="品牌图片" align="center" prop="picUrl">
         <template #default="scope">
-          <img v-if="scope.row.picUrl" :src="scope.row.picUrl" alt="品牌图片" class="h-100px" />
+          <img v-if="scope.row.picUrl" :src="scope.row.picUrl" alt="品牌图片" class="h-30px" />
         </template>
       </el-table-column>
       <el-table-column label="品牌排序" align="center" prop="sort" />
@@ -108,11 +110,14 @@
   <!-- 表单弹窗：添加/修改 -->
   <BrandForm ref="formRef" @success="getList" />
 </template>
-<script setup lang="ts" name="ProductBrand">
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import * as ProductBrandApi from '@/api/mall/product/brand'
 import BrandForm from './BrandForm.vue'
+
+defineOptions({ name: 'ProductBrand' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 

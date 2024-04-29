@@ -53,38 +53,13 @@
       @on-delete="onDelete"
     />
 
-    <!-- 添加或修改自动回复的对话框 -->
-    <!-- TODO @Dhb52 -->
-    <el-dialog :title="dialogTitle" v-model="showFormDialog" width="800px" destroy-on-close>
-      <el-form ref="formRef" :model="replyForm" :rules="rules" label-width="80px">
-        <el-form-item label="消息类型" prop="requestMessageType" v-if="msgType === MsgType.Message">
-          <el-select v-model="replyForm.requestMessageType" placeholder="请选择">
-            <template v-for="dict in getDictOptions(DICT_TYPE.MP_MESSAGE_TYPE)" :key="dict.value">
-              <el-option
-                v-if="RequestMessageTypes.includes(dict.value)"
-                :label="dict.label"
-                :value="dict.value"
-              />
-            </template>
-          </el-select>
-        </el-form-item>
-        <el-form-item label="匹配类型" prop="requestMatch" v-if="msgType === MsgType.Keyword">
-          <el-select v-model="replyForm.requestMatch" placeholder="请选择匹配类型" clearable>
-            <el-option
-              v-for="dict in getIntDictOptions(DICT_TYPE.MP_AUTO_REPLY_REQUEST_MATCH)"
-              :key="dict.value"
-              :label="dict.label"
-              :value="dict.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="关键词" prop="requestKeyword" v-if="msgType === MsgType.Keyword">
-          <el-input v-model="replyForm.requestKeyword" placeholder="请输入内容" clearable />
-        </el-form-item>
-        <el-form-item label="回复消息">
-          <WxReplySelect :objData="objData" />
-        </el-form-item>
-      </el-form>
+    <el-dialog
+      :title="isCreating ? '新增自动回复' : '修改自动回复'"
+      v-model="showDialog"
+      width="800px"
+      destroy-on-close
+    >
+      <ReplyForm v-model="replyForm" v-model:reply="reply" :msg-type="msgType" ref="formRef" />
       <template #footer>
         <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="onSubmit">确 定</el-button>
@@ -92,52 +67,47 @@
     </el-dialog>
   </ContentWrap>
 </template>
-<script setup lang="ts" name="MpAutoReply">
-import WxReplySelect from '@/views/mp/components/wx-reply/main.vue'
-import WxAccountSelect from '@/views/mp/components/wx-account-select/main.vue'
+<script lang="ts" setup>
+import ReplyForm from '@/views/mp/autoReply/components/ReplyForm.vue'
+import { type Reply, ReplyType } from '@/views/mp/components/wx-reply'
+import WxAccountSelect from '@/views/mp/components/wx-account-select'
 import * as MpAutoReplyApi from '@/api/mp/autoReply'
-import { DICT_TYPE, getDictOptions, getIntDictOptions } from '@/utils/dict'
 import { ContentWrap } from '@/components/ContentWrap'
 import type { TabPaneName } from 'element-plus'
 import ReplyTable from './components/ReplyTable.vue'
-import { MsgType, ReplyForm, ObjData } from './components/types'
+import { MsgType } from './components/types'
+
+defineOptions({ name: 'MpAutoReply' })
+
 const message = useMessage() // 消息
 
+const accountId = ref(-1) // 公众号ID
 const msgType = ref<MsgType>(MsgType.Keyword) // 消息类型
-const RequestMessageTypes = ['text', 'image', 'voice', 'video', 'shortvideo', 'location', 'link'] // 允许选择的请求消息类型
 const loading = ref(true) // 遮罩层
 const total = ref(0) // 总条数
 const list = ref<any[]>([]) // 自动回复列表
-const formRef = ref() // 表单 ref
+const formRef = ref<InstanceType<typeof ReplyForm> | null>(null) // 表单 ref
 // 查询参数
-interface QueryParams {
-  pageNo: number
-  pageSize: number
-  accountId?: number
-}
-const queryParams: QueryParams = reactive({
+const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  accountId: undefined
+  accountId: accountId
 })
 
-const dialogTitle = ref('') // 弹出层标题
-const showFormDialog = ref(false) // 是否显示弹出层
-const replyForm = ref<ReplyForm>({}) // 表单参数
+const isCreating = ref(false) // 是否新建（否则编辑）
+const showDialog = ref(false) // 是否显示弹出层
+const replyForm = ref<any>({}) // 表单参数
 // 回复消息
-const objData = ref<ObjData>({
-  type: 'text',
-  accountId: undefined
+const reply = ref<Reply>({
+  type: ReplyType.Text,
+  accountId: -1
 })
-// 表单校验
-const rules = {
-  requestKeyword: [{ required: true, message: '请求的关键字不能为空', trigger: 'blur' }],
-  requestMatch: [{ required: true, message: '请求的关键字的匹配不能为空', trigger: 'blur' }]
-}
 
 /** 侦听账号变化 */
-const onAccountChanged = (id?: number) => {
-  queryParams.accountId = id
+const onAccountChanged = (id: number) => {
+  accountId.value = id
+  reply.value.accountId = id
+  queryParams.pageNo = 1
   getList()
 }
 
@@ -171,13 +141,13 @@ const onTabChange = (tabName: TabPaneName) => {
 const onCreate = () => {
   reset()
   // 打开表单，并设置初始化
-  objData.value = {
-    type: 'text',
+  reply.value = {
+    type: ReplyType.Text,
     accountId: queryParams.accountId
   }
 
-  dialogTitle.value = '新增自动回复'
-  showFormDialog.value = true
+  isCreating.value = true
+  showDialog.value = true
 }
 
 /** 修改按钮操作 */
@@ -193,7 +163,7 @@ const onUpdate = async (id: number) => {
   delete replyForm.value['responseMediaUrl']
   delete replyForm.value['responseDescription']
   delete replyForm.value['responseArticles']
-  objData.value = {
+  reply.value = {
     type: data.responseMessageType,
     accountId: queryParams.accountId,
     content: data.responseContent,
@@ -209,8 +179,8 @@ const onUpdate = async (id: number) => {
   }
 
   // 打开表单
-  dialogTitle.value = '修改自动回复'
-  showFormDialog.value = true
+  isCreating.value = false
+  showDialog.value = true
 }
 
 /** 删除按钮操作 */
@@ -222,22 +192,21 @@ const onDelete = async (id: number) => {
 }
 
 const onSubmit = async () => {
-  const valid = await formRef.value?.validate()
-  if (!valid) return
+  await formRef.value?.validate()
 
   // 处理回复消息
   const submitForm: any = { ...replyForm.value }
-  submitForm.responseMessageType = objData.value.type
-  submitForm.responseContent = objData.value.content
-  submitForm.responseMediaId = objData.value.mediaId
-  submitForm.responseMediaUrl = objData.value.url
-  submitForm.responseTitle = objData.value.title
-  submitForm.responseDescription = objData.value.description
-  submitForm.responseThumbMediaId = objData.value.thumbMediaId
-  submitForm.responseThumbMediaUrl = objData.value.thumbMediaUrl
-  submitForm.responseArticles = objData.value.articles
-  submitForm.responseMusicUrl = objData.value.musicUrl
-  submitForm.responseHqMusicUrl = objData.value.hqMusicUrl
+  submitForm.responseMessageType = reply.value.type
+  submitForm.responseContent = reply.value.content
+  submitForm.responseMediaId = reply.value.mediaId
+  submitForm.responseMediaUrl = reply.value.url
+  submitForm.responseTitle = reply.value.title
+  submitForm.responseDescription = reply.value.description
+  submitForm.responseThumbMediaId = reply.value.thumbMediaId
+  submitForm.responseThumbMediaUrl = reply.value.thumbMediaUrl
+  submitForm.responseArticles = reply.value.articles
+  submitForm.responseMusicUrl = reply.value.musicUrl
+  submitForm.responseHqMusicUrl = reply.value.hqMusicUrl
 
   if (replyForm.value.id !== undefined) {
     await MpAutoReplyApi.updateAutoReply(submitForm)
@@ -247,7 +216,7 @@ const onSubmit = async () => {
     message.success('新增成功')
   }
 
-  showFormDialog.value = false
+  showDialog.value = false
   await getList()
 }
 
@@ -266,7 +235,7 @@ const reset = () => {
 
 // 取消按钮
 const cancel = () => {
-  showFormDialog.value = false
+  showDialog.value = false
   reset()
 }
 </script>

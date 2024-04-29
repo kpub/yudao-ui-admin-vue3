@@ -87,7 +87,11 @@
     <el-table v-loading="loading" :data="list">
       <el-table-column align="center" label="角色编号" prop="id" />
       <el-table-column align="center" label="角色名称" prop="name" />
-      <el-table-column align="center" label="角色类型" prop="type" />
+      <el-table-column label="角色类型" align="center" prop="type">
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.SYSTEM_ROLE_TYPE" :value="scope.row.type" />
+        </template>
+      </el-table-column>
       <el-table-column align="center" label="角色标识" prop="code" />
       <el-table-column align="center" label="显示顺序" prop="sort" />
       <el-table-column align="center" label="备注" prop="remark" />
@@ -160,7 +164,7 @@
   <!-- 表单弹窗：数据权限 -->
   <RoleDataPermissionForm ref="dataPermissionFormRef" @success="getList" />
 </template>
-<script lang="ts" name="SystemRole" setup>
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
@@ -168,6 +172,8 @@ import * as RoleApi from '@/api/system/role'
 import RoleForm from './RoleForm.vue'
 import RoleAssignMenuForm from './RoleAssignMenuForm.vue'
 import RoleDataPermissionForm from './RoleDataPermissionForm.vue'
+
+defineOptions({ name: 'SystemRole' })
 
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化

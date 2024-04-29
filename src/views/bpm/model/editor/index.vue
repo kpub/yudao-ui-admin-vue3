@@ -16,7 +16,7 @@
     <!-- 流程属性器，负责编辑每个流程节点的属性 -->
     <MyProcessPenal
       key="penal"
-      :bpmnModeler="modeler"
+      :bpmnModeler="modeler as any"
       :prefix="controlForm.prefix"
       class="process-panel"
       :model="model"
@@ -24,13 +24,15 @@
   </ContentWrap>
 </template>
 
-<script setup lang="ts" name="BpmModelEditor">
+<script lang="ts" setup>
 import { MyProcessDesigner, MyProcessPenal } from '@/components/bpmnProcessDesigner/package'
 // 自定义元素选中时的弹出菜单（修改 默认任务 为 用户任务）
 import CustomContentPadProvider from '@/components/bpmnProcessDesigner/package/designer/plugins/content-pad'
 // 自定义左侧菜单（修改 默认任务 为 用户任务）
 import CustomPaletteProvider from '@/components/bpmnProcessDesigner/package/designer/plugins/palette'
 import * as ModelApi from '@/api/bpm/model'
+
+defineOptions({ name: 'BpmModelEditor' })
 
 const router = useRouter() // 路由
 const { query } = useRoute() // 路由的查询
@@ -87,17 +89,27 @@ onMounted(async () => {
   }
   // 查询模型
   const data = await ModelApi.getModel(modelId)
-  xmlString.value = data.bpmnXml
+  if (!data.bpmnXml) {
+    // 首次创建的 Model 模型，它是没有 bpmnXml，此时需要给它一个默认的
+    data.bpmnXml = ` <?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.activiti.org/processdef">
+  <process id="${data.key}" name="${data.name}" isExecutable="true" />
+  <bpmndi:BPMNDiagram id="BPMNDiagram">
+    <bpmndi:BPMNPlane id="${data.key}_di" bpmnElement="${data.key}" />
+  </bpmndi:BPMNDiagram>
+</definitions>`
+  }
   model.value = {
     ...data,
     bpmnXml: undefined // 清空 bpmnXml 属性
   }
+  xmlString.value = data.bpmnXml
 })
 </script>
 <style lang="scss">
 .process-panel__container {
   position: absolute;
-  right: 60px;
   top: 90px;
+  right: 60px;
 }
 </style>

@@ -1,4 +1,6 @@
 <template>
+  <doc-alert title="工作流手册" url="https://doc.iocoder.cn/bpm/" />
+
   <ContentWrap>
     <!-- 搜索工作栏 -->
     <el-form
@@ -30,7 +32,7 @@
       <el-form-item label="创建时间" prop="createTime">
         <el-date-picker
           v-model="queryParams.createTime"
-          value-format="yyyy-MM-dd HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
           type="daterange"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
@@ -61,7 +63,7 @@
       <el-table-column label="描述" align="center" prop="description" />
       <el-table-column label="成员" align="center">
         <template #default="scope">
-          <span v-for="userId in scope.row.memberUserIds" :key="userId" class="pr-5px">
+          <span v-for="userId in scope.row.userIds" :key="userId" class="pr-5px">
             {{ userList.find((user) => user.id === userId)?.nickname }}
           </span>
         </template>
@@ -111,12 +113,16 @@
   <UserGroupForm ref="formRef" @success="getList" />
 </template>
 
-<script setup lang="ts" name="BpmUserGroup">
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import * as UserGroupApi from '@/api/bpm/userGroup'
 import * as UserApi from '@/api/system/user'
 import UserGroupForm from './UserGroupForm.vue'
+import { UserVO } from '@/api/system/user'
+
+defineOptions({ name: 'BpmUserGroup' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 
@@ -131,7 +137,7 @@ const queryParams = reactive({
   createTime: []
 })
 const queryFormRef = ref() // 搜索的表单
-const userList = ref([]) // 用户列表
+const userList = ref<UserVO[]>([]) // 用户列表
 
 /** 查询列表 */
 const getList = async () => {

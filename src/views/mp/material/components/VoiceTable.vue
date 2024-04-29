@@ -36,8 +36,8 @@
   </el-table>
 </template>
 
-<script setup lang="ts">
-import WxVoicePlayer from '@/views/mp/components/wx-voice-play/main.vue'
+<script lang="ts" setup>
+import WxVoicePlayer from '@/views/mp/components/wx-voice-play'
 import { dateFormatter } from '@/utils/formatTime'
 
 const props = defineProps<{

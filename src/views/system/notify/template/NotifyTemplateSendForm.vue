@@ -15,7 +15,21 @@
           type="textarea"
         />
       </el-form-item>
-      <el-form-item label="接收人" prop="userId">
+      <el-form-item label="用户类型" prop="userType">
+        <el-radio-group v-model="formData.userType">
+          <el-radio
+            v-for="dict in getIntDictOptions(DICT_TYPE.USER_TYPE)"
+            :key="dict.value"
+            :label="dict.value"
+          >
+            {{ dict.label }}
+          </el-radio>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item v-show="formData.userType === 1" label="接收人ID" prop="userId">
+        <el-input v-model="formData.userId" style="width: 160px" />
+      </el-form-item>
+      <el-form-item v-show="formData.userType === 2" label="接收人" prop="userId">
         <el-select v-model="formData.userId" placeholder="请选择接收人">
           <el-option
             v-for="item in userOption"
@@ -43,10 +57,13 @@
     </template>
   </Dialog>
 </template>
-<script lang="ts" name="SystemNotifyTemplateSendForm" setup>
-import * as SmsTemplateApi from '@/api/system/sms/smsTemplate'
+<script lang="ts" setup>
 import * as UserApi from '@/api/system/user'
 import * as NotifyTemplateApi from '@/api/system/notify/template'
+import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
+
+defineOptions({ name: 'SystemNotifyTemplateSendForm' })
+
 const message = useMessage() // 消息弹窗
 
 const dialogVisible = ref(false) // 弹窗的是否展示
@@ -54,7 +71,8 @@ const formLoading = ref(false) // 表单的加载中：1）修改时的数据加
 const formData = ref({
   content: '',
   params: {},
-  userId: null,
+  userId: undefined,
+  userType: 1,
   templateCode: '',
   templateParams: new Map()
 })
@@ -102,8 +120,8 @@ const submitForm = async () => {
   // 提交请求
   formLoading.value = true
   try {
-    const data = formData.value as SmsTemplateApi.SendSmsReqVO
-    const logId = await SmsTemplateApi.sendSms(data)
+    const data = formData.value as unknown as NotifyTemplateApi.NotifySendReqVO
+    const logId = await NotifyTemplateApi.sendNotify(data)
     if (logId) {
       message.success('提交发送成功！发送结果，见发送日志编号：' + logId)
     }
@@ -120,8 +138,9 @@ const resetForm = () => {
     params: {},
     mobile: '',
     templateCode: '',
-    templateParams: new Map()
-  }
+    templateParams: new Map(),
+    userType: 1
+  } as any
   formRef.value?.resetFields()
 }
 </script>

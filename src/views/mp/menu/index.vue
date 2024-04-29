@@ -10,13 +10,13 @@
   </ContentWrap>
 
   <ContentWrap>
-    <div class="public-account-management clearfix" v-loading="loading">
+    <div class="clearfix public-account-management" v-loading="loading">
       <!--左边配置菜单-->
       <div class="left">
         <div class="weixin-hd">
           <div class="weixin-title">{{ accountName }}</div>
         </div>
-        <div class="weixin-menu clearfix">
+        <div class="clearfix weixin-menu">
           <MenuPreviewer
             v-model="menuList"
             :account-id="accountId"
@@ -52,21 +52,23 @@
   </ContentWrap>
 </template>
 
-<script lang="ts" setup name="MpMenu">
-import WxAccountSelect from '@/views/mp/components/wx-account-select/main.vue'
+<script lang="ts" setup>
+import WxAccountSelect from '@/views/mp/components/wx-account-select'
 import MenuEditor from './components/MenuEditor.vue'
 import MenuPreviewer from './components/MenuPreviewer.vue'
 import * as MpMenuApi from '@/api/mp/menu'
 import * as UtilsTree from '@/utils/tree'
 import { RawMenu, Menu } from './components/types'
 
+defineOptions({ name: 'MpMenu' })
+
 const message = useMessage() // 消息
 const MENU_NOT_SELECTED = '__MENU_NOT_SELECTED__'
 
 // ======================== 列表查询 ========================
 const loading = ref(false) // 遮罩层
-const accountId = ref<number | undefined>()
-const accountName = ref<string | undefined>('')
+const accountId = ref(-1)
+const accountName = ref<string>('')
 const menuList = ref<Menu[]>([])
 
 // ======================== 菜单操作 ========================
@@ -103,7 +105,7 @@ const tempSelfObj = ref<{
 const dialogNewsVisible = ref(false) // 跳转图文时的素材选择弹窗
 
 /** 侦听公众号变化 **/
-const onAccountChanged = (id?: number, name?: string) => {
+const onAccountChanged = (id: number, name: string) => {
   accountId.value = id
   accountName.value = name
   getList()
@@ -339,7 +341,7 @@ div {
 
   .left {
     position: relative;
-    display: inline-block;
+    display: block;
     float: left;
     width: 350px;
     height: 715px;
@@ -366,7 +368,6 @@ div {
     padding: 20px;
     margin-left: 20px;
     background-color: #e8e7e7;
-    box-sizing: border-box;
     box-sizing: border-box;
   }
 }

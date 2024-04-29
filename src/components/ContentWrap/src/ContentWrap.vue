@@ -1,6 +1,8 @@
-<script lang="ts" name="ContentWrap" setup>
+<script lang="ts" setup>
 import { propTypes } from '@/utils/propTypes'
 import { useDesign } from '@/hooks/web/useDesign'
+
+defineOptions({ name: 'ContentWrap' })
 
 const { getPrefixCls } = useDesign()
 
@@ -23,6 +25,9 @@ defineProps({
           </template>
           <Icon :size="14" class="ml-5px" icon="ep:question-filled" />
         </ElTooltip>
+        <div class="flex flex-grow pl-20px">
+          <slot name="header"></slot>
+        </div>
       </div>
     </template>
     <div>

@@ -17,17 +17,13 @@ export interface CategoryVO {
    */
   name: string
   /**
-   * 分类图片
+   * 移动端分类图
    */
   picUrl: string
   /**
    * 分类排序
    */
-  sort?: number
-  /**
-   * 分类描述
-   */
-  description?: string
+  sort: number
   /**
    * 开启状态
    */

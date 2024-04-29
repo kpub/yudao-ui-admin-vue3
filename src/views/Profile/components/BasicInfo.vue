@@ -1,5 +1,5 @@
 <template>
-  <Form ref="formRef" :labelWidth="80" :rules="rules" :schema="schema">
+  <Form ref="formRef" :labelWidth="200" :rules="rules" :schema="schema">
     <template #sex="form">
       <el-radio-group v-model="form['sex']">
         <el-radio :label="1">{{ t('profile.user.man') }}</el-radio>
@@ -7,13 +7,13 @@
       </el-radio-group>
     </template>
   </Form>
-  <XButton :title="t('common.save')" @click="submit()" />
-  <XButton :title="t('common.reset')" type="danger" @click="init()" />
+  <div style="text-align: center">
+    <XButton :title="t('common.save')" type="primary" @click="submit()" />
+    <XButton :title="t('common.reset')" type="danger" @click="init()" />
+  </div>
 </template>
-<script lang="ts" name="BasicInfo" setup>
+<script lang="ts" setup>
 import type { FormRules } from 'element-plus'
-import { ElMessage } from 'element-plus'
-
 import { FormSchema } from '@/types/form'
 import type { FormExpose } from '@/components/Form'
 import {
@@ -21,8 +21,13 @@ import {
   updateUserProfile,
   UserProfileUpdateReqVO
 } from '@/api/system/user/profile'
+import { useUserStore } from '@/store/modules/user'
+
+defineOptions({ name: 'BasicInfo' })
 
 const { t } = useI18n()
+const message = useMessage() // 消息弹窗
+const userStore = useUserStore() 
 // 表单校验
 const rules = reactive<FormRules>({
   nickname: [{ required: true, message: t('profile.rules.nickname'), trigger: 'blur' }],
@@ -74,14 +79,16 @@ const submit = () => {
     if (valid) {
       const data = unref(formRef)?.formModel as UserProfileUpdateReqVO
       await updateUserProfile(data)
-      ElMessage.success(t('common.updateSuccess'))
-      await init()
+      message.success(t('common.updateSuccess'))
+      const profile = await init()
+      userStore.setUserNicknameAction(profile.nickname)
     }
   })
 }
 const init = async () => {
   const res = await getUserProfile()
   unref(formRef)?.setValues(res)
+  return res
 }
 onMounted(async () => {
   await init()

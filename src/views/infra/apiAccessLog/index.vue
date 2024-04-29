@@ -46,7 +46,7 @@
       <el-form-item label="请求时间" prop="beginTime">
         <el-date-picker
           v-model="queryParams.beginTime"
-          value-format="yyyy-MM-dd HH:mm:ss"
+          value-format="YYYY-MM-DD HH:mm:ss"
           type="daterange"
           start-placeholder="开始日期"
           end-placeholder="结束日期"
@@ -80,7 +80,7 @@
           plain
           @click="handleExport"
           :loading="exportLoading"
-          v-hasPermi="['infra:api-error-log:export']"
+          v-hasPermi="['infra:api-access-log:export']"
         >
           <Icon icon="ep:download" class="mr-5px" /> 导出
         </el-button>
@@ -91,16 +91,16 @@
   <!-- 列表 -->
   <ContentWrap>
     <el-table v-loading="loading" :data="list">
-      <el-table-column label="日志编号" align="center" prop="id" />
+      <el-table-column label="日志编号" align="center" prop="id" width="100" fix="right" />
       <el-table-column label="用户编号" align="center" prop="userId" />
       <el-table-column label="用户类型" align="center" prop="userType">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.USER_TYPE" :value="scope.row.userType" />
         </template>
       </el-table-column>
-      <el-table-column label="应用名" align="center" prop="applicationName" />
+      <el-table-column label="应用名" align="center" prop="applicationName" width="150" />
       <el-table-column label="请求方法" align="center" prop="requestMethod" width="80" />
-      <el-table-column label="请求地址" align="center" prop="requestUrl" width="250" />
+      <el-table-column label="请求地址" align="center" prop="requestUrl" width="500" />
       <el-table-column label="请求时间" align="center" prop="beginTime" width="180">
         <template #default="scope">
           <span>{{ formatDate(scope.row.beginTime) }}</span>
@@ -114,7 +114,14 @@
           {{ scope.row.resultCode === 0 ? '成功' : '失败(' + scope.row.resultMsg + ')' }}
         </template>
       </el-table-column>
-      <el-table-column label="操作" align="center">
+      <el-table-column label="操作模块" align="center" prop="operateModule" width="180" />
+      <el-table-column label="操作名" align="center" prop="operateName" width="180" />
+      <el-table-column label="操作类型" align="center" prop="operateType">
+        <template #default="scope">
+          <dict-tag :type="DICT_TYPE.INFRA_OPERATE_TYPE" :value="scope.row.operateType" />
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" align="center" fixed="right" width="60">
         <template #default="scope">
           <el-button
             link
@@ -139,12 +146,15 @@
   <!-- 表单弹窗：详情 -->
   <ApiAccessLogDetail ref="detailRef" />
 </template>
-<script setup lang="ts" name="InfraApiAccessLog">
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import download from '@/utils/download'
 import { formatDate } from '@/utils/formatTime'
 import * as ApiAccessLogApi from '@/api/infra/apiAccessLog'
 import ApiAccessLogDetail from './ApiAccessLogDetail.vue'
+
+defineOptions({ name: 'InfraApiAccessLog' })
+
 const message = useMessage() // 消息弹窗
 
 const loading = ref(true) // 列表的加载中

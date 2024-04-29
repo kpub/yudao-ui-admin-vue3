@@ -65,7 +65,7 @@
         >
           <Icon icon="ep:download" class="mr-5px" /> 导出
         </el-button>
-        <el-button type="info" plain @click="handleJobLog" v-hasPermi="['infra:job:query']">
+        <el-button type="info" plain @click="handleJobLog()" v-hasPermi="['infra:job:query']">
           <Icon icon="ep:zoom-in" class="mr-5px" /> 执行日志
         </el-button>
       </el-form-item>
@@ -106,7 +106,7 @@
           <el-button
             type="danger"
             link
-            @click="handleDelete(scope.row)"
+            @click="handleDelete(scope.row.id)"
             v-hasPermi="['infra:job:delete']"
           >
             删除
@@ -147,7 +147,7 @@
   <!-- 表单弹窗：查看 -->
   <JobDetail ref="detailRef" />
 </template>
-<script setup lang="ts" name="InfraJob">
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { checkPermi } from '@/utils/permission'
 import JobForm from './JobForm.vue'
@@ -155,6 +155,9 @@ import JobDetail from './JobDetail.vue'
 import download from '@/utils/download'
 import * as JobApi from '@/api/infra/job'
 import { InfraJobStatusEnum } from '@/utils/constants'
+
+defineOptions({ name: 'InfraJob' })
+
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 const { push } = useRouter() // 路由
@@ -289,8 +292,8 @@ const openDetail = (id: number) => {
 }
 
 /** 跳转执行日志 */
-const handleJobLog = (id: number) => {
-  if (id > 0) {
+const handleJobLog = (id?: number) => {
+  if (id && id > 0) {
     push('/job/job-log?id=' + id)
   } else {
     push('/job/job-log')

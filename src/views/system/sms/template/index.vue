@@ -211,7 +211,7 @@
   <!-- 表单弹窗：测试发送 -->
   <SmsTemplateSendForm ref="sendFormRef" />
 </template>
-<script setup lang="ts" name="SystemSmsTemplate">
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions, getDictLabel } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import * as SmsTemplateApi from '@/api/system/sms/smsTemplate'
@@ -219,6 +219,9 @@ import * as SmsChannelApi from '@/api/system/sms/smsChannel'
 import download from '@/utils/download'
 import SmsTemplateForm from './SmsTemplateForm.vue'
 import SmsTemplateSendForm from './SmsTemplateSendForm.vue'
+
+defineOptions({ name: 'SystemSmsTemplate' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 
@@ -229,12 +232,12 @@ const queryFormRef = ref() // 搜索的表单
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  type: null,
-  status: null,
+  type: undefined,
+  status: undefined,
   code: '',
   content: '',
   apiTemplateId: '',
-  channelId: null,
+  channelId: undefined,
   createTime: []
 })
 const exportLoading = ref(false) // 导出的加载中

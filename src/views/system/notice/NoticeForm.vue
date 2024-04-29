@@ -11,15 +11,15 @@
         <el-input v-model="formData.title" placeholder="请输入公告标题" />
       </el-form-item>
       <el-form-item label="公告内容" prop="content">
-        <Editor :model-value="formData.content" height="150px" />
+        <Editor v-model="formData.content" height="150px" />
       </el-form-item>
       <el-form-item label="公告类型" prop="type">
         <el-select v-model="formData.type" clearable placeholder="请选择公告类型">
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.SYSTEM_NOTICE_TYPE)"
-            :key="parseInt(dict.value)"
+            :key="parseInt(dict.value as any)"
             :label="dict.label"
-            :value="parseInt(dict.value)"
+            :value="parseInt(dict.value as any)"
           />
         </el-select>
       </el-form-item>
@@ -27,9 +27,9 @@
         <el-select v-model="formData.status" clearable placeholder="请选择状态">
           <el-option
             v-for="dict in getIntDictOptions(DICT_TYPE.COMMON_STATUS)"
-            :key="parseInt(dict.value)"
+            :key="parseInt(dict.value as any)"
             :label="dict.label"
-            :value="parseInt(dict.value)"
+            :value="parseInt(dict.value as any)"
           />
         </el-select>
       </el-form-item>
@@ -43,10 +43,12 @@
     </template>
   </Dialog>
 </template>
-<script lang="ts" name="SystemNoticeForm" setup>
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { CommonStatusEnum } from '@/utils/constants'
 import * as NoticeApi from '@/api/system/notice'
+
+defineOptions({ name: 'SystemNoticeForm' })
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

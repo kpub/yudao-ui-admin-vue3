@@ -106,11 +106,14 @@
   <!-- 表单弹窗：添加/修改 -->
   <TenantPackageForm ref="formRef" @success="getList" />
 </template>
-<script setup lang="ts" name="SystemTenantPackage">
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import * as TenantPackageApi from '@/api/system/tenantPackage'
 import TenantPackageForm from './TenantPackageForm.vue'
+
+defineOptions({ name: 'SystemTenantPackage' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 
@@ -120,9 +123,9 @@ const list = ref([]) // 列表的数据
 const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  name: null,
-  status: null,
-  remark: null,
+  name: undefined,
+  status: undefined,
+  remark: undefined,
   createTime: []
 })
 const queryFormRef = ref() // 搜索的表单
@@ -131,7 +134,7 @@ const queryFormRef = ref() // 搜索的表单
 const getList = async () => {
   loading.value = true
   try {
-    const data = await TenantPackageApi.getTenantPackagePage(queryParams.value)
+    const data = await TenantPackageApi.getTenantPackagePage(queryParams)
     list.value = data.list
     total.value = data.total
   } finally {

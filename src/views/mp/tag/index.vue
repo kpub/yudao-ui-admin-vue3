@@ -14,10 +14,22 @@
         <WxAccountSelect @change="onAccountChanged" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" plain @click="openForm('create')" v-hasPermi="['mp:tag:create']">
+        <el-button
+          type="primary"
+          plain
+          @click="openForm('create')"
+          v-hasPermi="['mp:tag:create']"
+          :disabled="queryParams.accountId === 0"
+        >
           <Icon icon="ep:plus" class="mr-5px" /> 新增
         </el-button>
-        <el-button type="success" plain @click="handleSync" v-hasPermi="['mp:tag:sync']">
+        <el-button
+          type="success"
+          plain
+          @click="handleSync"
+          v-hasPermi="['mp:tag:sync']"
+          :disabled="queryParams.accountId === 0"
+        >
           <Icon icon="ep:refresh" class="mr-5px" /> 同步
         </el-button>
       </el-form-item>
@@ -70,34 +82,33 @@
   <!-- 表单弹窗：添加/修改 -->
   <TagForm ref="formRef" @success="getList" />
 </template>
-<script setup lang="ts" name="MpTag">
+<script lang="ts" setup>
 import { dateFormatter } from '@/utils/formatTime'
 import * as MpTagApi from '@/api/mp/tag'
 import TagForm from './TagForm.vue'
-import WxAccountSelect from '@/views/mp/components/wx-account-select/main.vue'
+import WxAccountSelect from '@/views/mp/components/wx-account-select'
+
+defineOptions({ name: 'MpTag' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 
 const loading = ref(true) // 列表的加载中
 const total = ref(0) // 列表的总页数
-const list = ref<any>([]) // 列表的数据
+const list = ref<any[]>([]) // 列表的数据
 
-interface QueryParams {
-  pageNo: number
-  pageSize: number
-  accountId?: number
-}
-const queryParams: QueryParams = reactive({
+const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  accountId: undefined
+  accountId: -1
 })
+
 const formRef = ref<InstanceType<typeof TagForm> | null>(null)
 
 /** 侦听公众号变化 **/
-const onAccountChanged = (id?: number) => {
-  queryParams.pageNo = 1
+const onAccountChanged = (id: number) => {
   queryParams.accountId = id
+  queryParams.pageNo = 1
   getList()
 }
 
@@ -114,8 +125,8 @@ const getList = async () => {
 }
 
 /** 添加/修改操作 */
-const openForm = (type: string, id?: number) => {
-  formRef.value?.open(type, queryParams.accountId as number, id)
+const openForm = (type: 'create' | 'update', id?: number) => {
+  formRef.value?.open(type, queryParams.accountId, id)
 }
 
 /** 删除按钮操作 */

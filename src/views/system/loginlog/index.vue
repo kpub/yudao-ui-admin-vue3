@@ -47,7 +47,7 @@
           plain
           @click="handleExport"
           :loading="exportLoading"
-          v-hasPermi="['infra:config:export']"
+          v-hasPermi="['infra:login-log:export']"
         >
           <Icon icon="ep:download" class="mr-5px" /> 导出
         </el-button>
@@ -85,7 +85,7 @@
             link
             type="primary"
             @click="openDetail(scope.row)"
-            v-hasPermi="['infra:config:query']"
+            v-hasPermi="['infra:login-log:query']"
           >
             详情
           </el-button>
@@ -104,12 +104,15 @@
   <!-- 表单弹窗：详情 -->
   <LoginLogDetail ref="detailRef" />
 </template>
-<script setup lang="ts" name="SystemLoginLog">
+<script lang="ts" setup>
 import { DICT_TYPE } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
 import * as LoginLogApi from '@/api/system/loginLog'
 import LoginLogDetail from './LoginLogDetail.vue'
+
+defineOptions({ name: 'SystemLoginLog' })
+
 const message = useMessage() // 消息弹窗
 
 const loading = ref(true) // 列表的加载中

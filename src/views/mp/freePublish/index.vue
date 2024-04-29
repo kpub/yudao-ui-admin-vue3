@@ -48,10 +48,13 @@
   </ContentWrap>
 </template>
 
-<script lang="ts" setup name="MpFreePublish">
+<script lang="ts" setup>
 import * as FreePublishApi from '@/api/mp/freePublish'
-import WxNews from '@/views/mp/components/wx-news/main.vue'
-import WxAccountSelect from '@/views/mp/components/wx-account-select/main.vue'
+import WxNews from '@/views/mp/components/wx-news'
+import WxAccountSelect from '@/views/mp/components/wx-account-select'
+
+defineOptions({ name: 'MpFreePublish' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 
@@ -59,20 +62,16 @@ const loading = ref(true) // 列表的加载中
 const total = ref(0) // 列表的总页数
 const list = ref<any[]>([]) // 列表的数据
 
-interface QueryParams {
-  pageNo: number
-  pageSize: number
-  accountId?: number
-}
-const queryParams: QueryParams = reactive({
+const queryParams = reactive({
   pageNo: 1,
   pageSize: 10,
-  accountId: undefined
+  accountId: -1
 })
 
 /** 侦听公众号变化 **/
-const onAccountChanged = (id: number | undefined) => {
+const onAccountChanged = (id: number) => {
   queryParams.accountId = id
+  queryParams.pageNo = 1
   getList()
 }
 
@@ -102,19 +101,45 @@ const handleDelete = async (item: any) => {
 }
 </script>
 <style lang="scss" scoped>
+@media (width >= 992px) and (width <= 1300px) {
+  .waterfall {
+    column-count: 3;
+  }
+
+  p {
+    color: red;
+  }
+}
+
+@media (width >= 768px) and (width <= 991px) {
+  .waterfall {
+    column-count: 2;
+  }
+
+  p {
+    color: orange;
+  }
+}
+
+@media (width <= 767px) {
+  .waterfall {
+    column-count: 1;
+  }
+}
+
 .ope-row {
+  padding-top: 5px;
   margin-top: 5px;
   text-align: center;
   border-top: 1px solid #eaeaea;
-  padding-top: 5px;
 }
 
 .item-name {
-  font-size: 12px;
   overflow: hidden;
+  font-size: 12px;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-  text-align: center;
 }
 
 .el-upload__tip {
@@ -125,8 +150,8 @@ const handleDelete = async (item: any) => {
 .left {
   display: inline-block;
   width: 35%;
-  vertical-align: top;
   margin-top: 200px;
+  vertical-align: top;
 }
 
 .right {
@@ -136,16 +161,16 @@ const handleDelete = async (item: any) => {
 }
 
 .avatar-uploader {
-  width: 20%;
   display: inline-block;
+  width: 20%;
 }
 
 .avatar-uploader .el-upload {
-  border-radius: 6px;
-  cursor: pointer;
   position: relative;
   overflow: hidden;
   text-align: unset !important;
+  cursor: pointer;
+  border-radius: 6px;
 }
 
 .avatar-uploader .el-upload:hover {
@@ -153,13 +178,13 @@ const handleDelete = async (item: any) => {
 }
 
 .avatar-uploader-icon {
-  border: 1px solid #d9d9d9;
-  font-size: 28px;
-  color: #8c939d;
   width: 120px;
   height: 120px;
+  font-size: 28px;
   line-height: 120px;
+  color: #8c939d;
   text-align: center;
+  border: 1px solid #d9d9d9;
 }
 
 .avatar {
@@ -173,13 +198,14 @@ const handleDelete = async (item: any) => {
 }
 
 .digest {
-  width: 60%;
   display: inline-block;
+  width: 60%;
   vertical-align: top;
 }
 
-/*新增图文*/
-/*瀑布流样式*/
+/* 新增图文 */
+
+/* 瀑布流样式 */
 .waterfall {
   width: 100%;
   column-gap: 10px;
@@ -198,68 +224,44 @@ p {
   line-height: 30px;
 }
 
-@media (min-width: 992px) and (max-width: 1300px) {
-  .waterfall {
-    column-count: 3;
-  }
-  p {
-    color: red;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  .waterfall {
-    column-count: 2;
-  }
-  p {
-    color: orange;
-  }
-}
-
-@media (max-width: 767px) {
-  .waterfall {
-    column-count: 1;
-  }
-}
-
-/*瀑布流样式*/
+/* 瀑布流样式 */
 .news-main {
-  background-color: #ffffff;
   width: 100%;
-  margin: auto;
   height: 120px;
+  margin: auto;
+  background-color: #fff;
 }
 
 .news-content {
-  background-color: #acadae;
+  position: relative;
   width: 100%;
   height: 120px;
-  position: relative;
+  background-color: #acadae;
 }
 
 .news-content-title {
-  display: inline-block;
-  font-size: 15px;
-  color: #ffffff;
   position: absolute;
-  left: 0px;
-  bottom: 0px;
-  background-color: black;
+  bottom: 0;
+  left: 0;
+  display: inline-block;
   width: 98%;
+  height: 25px;
   padding: 1%;
-  opacity: 0.65;
   overflow: hidden;
+  font-size: 15px;
+  color: #fff;
   text-overflow: ellipsis;
   white-space: nowrap;
-  height: 25px;
+  background-color: black;
+  opacity: 0.65;
 }
 
 .news-main-item {
-  background-color: #ffffff;
-  padding: 5px 0px;
-  border-top: 1px solid #eaeaea;
   width: 100%;
+  padding: 5px 0;
   margin: auto;
+  background-color: #fff;
+  border-top: 1px solid #eaeaea;
 }
 
 .news-content-item {
@@ -269,8 +271,8 @@ p {
 
 .news-content-item-title {
   display: inline-block;
-  font-size: 12px;
   width: 70%;
+  font-size: 12px;
 }
 
 .news-content-item-img {
@@ -289,9 +291,9 @@ p {
 
 .news-main-plus {
   width: 280px;
-  text-align: center;
-  margin: auto;
   height: 50px;
+  margin: auto;
+  text-align: center;
 }
 
 .icon-plus {
@@ -302,15 +304,15 @@ p {
 .select-item {
   width: 60%;
   padding: 10px;
-  margin: 0 auto 10px auto;
+  margin: 0 auto 10px;
   border: 1px solid #eaeaea;
 }
 
 .father .child {
-  display: none;
-  text-align: center;
   position: relative;
   bottom: 25px;
+  display: none;
+  text-align: center;
 }
 
 .father:hover .child {

@@ -16,11 +16,13 @@
     </el-descriptions>
   </ContentWrap>
 </template>
-<script lang="ts" name="BpmOALeaveDetail" setup>
+<script lang="ts" setup>
 import { DICT_TYPE } from '@/utils/dict'
 import { formatDate } from '@/utils/formatTime'
 import { propTypes } from '@/utils/propTypes'
 import * as LeaveApi from '@/api/bpm/leave'
+
+defineOptions({ name: 'BpmOALeaveDetail' })
 
 const { query } = useRoute() // 查询参数
 
@@ -28,7 +30,7 @@ const props = defineProps({
   id: propTypes.number.def(undefined)
 })
 const detailLoading = ref(false) // 表单的加载中
-const detailData = ref({}) // 详情数据
+const detailData = ref<any>({}) // 详情数据
 const queryId = query.id as unknown as number // 从 URL 传递过来的 id 编号
 
 /** 获得数据 */

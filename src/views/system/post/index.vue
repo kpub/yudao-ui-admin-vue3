@@ -41,7 +41,7 @@
           type="primary"
           plain
           @click="openForm('create')"
-          v-hasPermi="['system:notice:create']"
+          v-hasPermi="['system:post:create']"
         >
           <Icon icon="ep:plus" class="mr-5px" /> 新增
         </el-button>
@@ -50,7 +50,7 @@
           plain
           @click="handleExport"
           :loading="exportLoading"
-          v-hasPermi="['infra:config:export']"
+          v-hasPermi="['system:post:export']"
         >
           <Icon icon="ep:download" class="mr-5px" /> 导出
         </el-button>
@@ -111,12 +111,15 @@
   <!-- 表单弹窗：添加/修改 -->
   <PostForm ref="formRef" @success="getList" />
 </template>
-<script setup lang="tsx" name="SystemPost">
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import download from '@/utils/download'
 import * as PostApi from '@/api/system/post'
 import PostForm from './PostForm.vue'
+
+defineOptions({ name: 'SystemPost' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 

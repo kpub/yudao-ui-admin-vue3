@@ -45,8 +45,11 @@
     </template>
   </Dialog>
 </template>
-<script setup lang="ts" name="JobForm">
+<script lang="ts" setup>
 import * as JobApi from '@/api/infra/job'
+
+defineOptions({ name: 'JobForm' })
+
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗
 
@@ -59,7 +62,10 @@ const formData = ref({
   name: '',
   handlerName: '',
   handlerParam: '',
-  cronExpression: ''
+  cronExpression: '',
+  retryCount: undefined,
+  retryInterval: undefined,
+  monitorTimeout: undefined
 })
 const formRules = reactive({
   name: [{ required: true, message: '任务名称不能为空', trigger: 'blur' }],
@@ -121,7 +127,10 @@ const resetForm = () => {
     name: '',
     handlerName: '',
     handlerParam: '',
-    cronExpression: ''
+    cronExpression: '',
+    retryCount: undefined,
+    retryInterval: undefined,
+    monitorTimeout: undefined
   }
   formRef.value?.resetFields()
 }

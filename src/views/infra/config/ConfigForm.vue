@@ -23,7 +23,7 @@
         <el-radio-group v-model="formData.visible">
           <el-radio
             v-for="dict in getBoolDictOptions(DICT_TYPE.INFRA_BOOLEAN_STRING)"
-            :key="dict.value"
+            :key="dict.value as string"
             :label="dict.value"
           >
             {{ dict.label }}
@@ -40,9 +40,11 @@
     </template>
   </Dialog>
 </template>
-<script lang="ts" name="InfraConfigForm" setup>
+<script lang="ts" setup>
 import { DICT_TYPE, getBoolDictOptions } from '@/utils/dict'
 import * as ConfigApi from '@/api/infra/config'
+
+defineOptions({ name: 'InfraConfigForm' })
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息弹窗

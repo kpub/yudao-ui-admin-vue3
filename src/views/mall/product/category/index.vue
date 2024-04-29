@@ -1,4 +1,6 @@
 <template>
+  <doc-alert title="【商品】商品分类" url="https://doc.iocoder.cn/mall/product-category/" />
+
   <!-- 搜索工作栏 -->
   <ContentWrap>
     <el-form
@@ -35,14 +37,14 @@
   <!-- 列表 -->
   <ContentWrap>
     <el-table v-loading="loading" :data="list" row-key="id" default-expand-all>
-      <el-table-column label="分类名称" prop="name" sortable />
-      <el-table-column label="分类图片" align="center" prop="picUrl">
+      <el-table-column label="名称" min-width="240" prop="name" sortable />
+      <el-table-column label="分类图标" align="center" min-width="80" prop="picUrl">
         <template #default="scope">
-          <img v-if="scope.row.picUrl" :src="scope.row.picUrl" alt="分类图片" class="h-100px" />
+          <img :src="scope.row.picUrl" alt="移动端分类图" class="h-36px" />
         </template>
       </el-table-column>
-      <el-table-column label="分类排序" align="center" prop="sort" />
-      <el-table-column label="开启状态" align="center" prop="status">
+      <el-table-column label="排序" align="center" min-width="150" prop="sort" />
+      <el-table-column label="状态" align="center" min-width="150" prop="status">
         <template #default="scope">
           <dict-tag :type="DICT_TYPE.COMMON_STATUS" :value="scope.row.status" />
         </template>
@@ -80,12 +82,15 @@
   <!-- 表单弹窗：添加/修改 -->
   <CategoryForm ref="formRef" @success="getList" />
 </template>
-<script setup lang="ts" name="ProductCategory">
+<script lang="ts" setup>
 import { DICT_TYPE } from '@/utils/dict'
 import { handleTree } from '@/utils/tree'
 import { dateFormatter } from '@/utils/formatTime'
 import * as ProductCategoryApi from '@/api/mall/product/category'
 import CategoryForm from './CategoryForm.vue'
+
+defineOptions({ name: 'ProductCategory' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 

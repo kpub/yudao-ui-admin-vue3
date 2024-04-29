@@ -5,8 +5,10 @@
     </template>
   </el-alert>
 </template>
-<script setup lang="tsx" name="DocAlert">
+<script setup lang="tsx">
 import { propTypes } from '@/utils/propTypes'
+
+defineOptions({ name: 'DocAlert' })
 
 const props = defineProps({
   title: propTypes.string,
@@ -20,13 +22,13 @@ const goToUrl = () => {
 
 /** 是否开启 */
 const getEnable = () => {
-  return import.meta.env.VITE_APP_TENANT_ENABLE === 'true'
+  return import.meta.env.VITE_APP_DOCALERT_ENABLE !== 'false'
 }
 </script>
 <style scoped>
 .el-alert--success.is-light {
-  border: 1px solid green;
   margin-bottom: 10px;
   cursor: pointer;
+  border: 1px solid green;
 }
 </style>

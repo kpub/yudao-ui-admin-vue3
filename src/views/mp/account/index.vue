@@ -46,7 +46,7 @@
             v-if="scope.row.qrCodeUrl"
             :src="scope.row.qrCodeUrl"
             alt="二维码"
-            style="height: 100px; display: inline-block"
+            style="display: inline-block; height: 100px"
           />
           <el-button
             link
@@ -100,9 +100,12 @@
   <!-- 对话框(添加 / 修改) -->
   <AccountForm ref="formRef" @success="getList" />
 </template>
-<script setup lang="ts" name="MpAccount">
+<script lang="ts" setup>
 import * as AccountApi from '@/api/mp/account'
 import AccountForm from './AccountForm.vue'
+
+defineOptions({ name: 'MpAccount' })
+
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
 

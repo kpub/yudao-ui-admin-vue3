@@ -1,6 +1,6 @@
 <template>
   <div class="my-process-designer">
-    <div class="my-process-designer__header" style="display: table-row-group; z-index: 999">
+    <div class="my-process-designer__header" style="z-index: 999; display: table-row-group">
       <slot name="control-header"></slot>
       <template v-if="!$slots['control-header']">
         <ElButtonGroup key="file-control">
@@ -206,7 +206,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="MyProcessDesigner">
+<script lang="ts" setup>
 // import 'bpmn-js/dist/assets/diagram-js.css' // 左边工具栏以及编辑节点的样式
 // import 'bpmn-js/dist/assets/bpmn-font/css/bpmn.css'
 // import 'bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css'
@@ -244,6 +244,9 @@ import { XmlNode, XmlNodeType, parseXmlString } from 'steady-xml'
 // const eventName = reactive({
 //   name: ''
 // })
+
+defineOptions({ name: 'MyProcessDesigner' })
+
 const bpmnCanvas = ref()
 const refFile = ref()
 const emit = defineEmits([
@@ -433,7 +436,7 @@ const initBpmnModeler = () => {
 
   // bpmnModeler.createDiagram()
 
-  console.log(bpmnModeler, 'bpmnModeler111111')
+  // console.log(bpmnModeler, 'bpmnModeler111111')
   emit('init-finished', bpmnModeler)
   initModelListeners()
 }
@@ -663,10 +666,10 @@ const previewProcessJson = () => {
 }
 /* ------------------------------------------------ 芋道源码 methods ------------------------------------------------------ */
 const processSave = async () => {
-  console.log(bpmnModeler, 'bpmnModelerbpmnModelerbpmnModelerbpmnModeler')
+  // console.log(bpmnModeler, 'bpmnModelerbpmnModelerbpmnModelerbpmnModeler')
   const { err, xml } = await bpmnModeler.saveXML()
-  console.log(err, 'errerrerrerrerr')
-  console.log(xml, 'xmlxmlxmlxmlxml')
+  // console.log(err, 'errerrerrerrerr')
+  // console.log(xml, 'xmlxmlxmlxmlxml')
   // 读取异常时抛出异常
   if (err) {
     // this.$modal.msgError('保存模型失败，请重试！')

@@ -19,7 +19,7 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 const props = defineProps<{
   list: any[]
   loading: boolean
@@ -31,12 +31,38 @@ const emit = defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-/*瀑布流样式*/
+@media (width >= 992px) and (width <= 1300px) {
+  .waterfall {
+    column-count: 3;
+  }
+
+  p {
+    color: red;
+  }
+}
+
+@media (width >= 768px) and (width <= 991px) {
+  .waterfall {
+    column-count: 2;
+  }
+
+  p {
+    color: orange;
+  }
+}
+
+@media (width <= 767px) {
+  .waterfall {
+    column-count: 1;
+  }
+}
+
 .waterfall {
   width: 100%;
   column-gap: 10px;
   column-count: 5;
   margin-top: 10px;
+
   /* 芋道源码：增加 10px，避免顶着上面 */
 }
 
@@ -53,31 +79,5 @@ const emit = defineEmits<{
 
 p {
   line-height: 30px;
-}
-
-@media (min-width: 992px) and (max-width: 1300px) {
-  .waterfall {
-    column-count: 3;
-  }
-
-  p {
-    color: red;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 991px) {
-  .waterfall {
-    column-count: 2;
-  }
-
-  p {
-    color: orange;
-  }
-}
-
-@media (max-width: 767px) {
-  .waterfall {
-    column-count: 1;
-  }
 }
 </style>

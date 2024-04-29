@@ -38,13 +38,16 @@
     </template>
   </Dialog>
 </template>
-<script lang="ts" name="BpmFormEditor" setup>
+<script lang="ts" setup>
 import { DICT_TYPE, getIntDictOptions } from '@/utils/dict'
 import { CommonStatusEnum } from '@/utils/constants'
 import * as FormApi from '@/api/bpm/form'
 import FcDesigner from '@form-create/designer'
 import { encodeConf, encodeFields, setConfAndFields } from '@/utils/formCreate'
 import { useTagsViewStore } from '@/store/modules/tagsView'
+import { useFormCreateDesigner } from '@/components/FormCreate'
+
+defineOptions({ name: 'BpmFormEditor' })
 
 const { t } = useI18n() // 国际化
 const message = useMessage() // 消息
@@ -53,6 +56,7 @@ const { query } = useRoute() // 路由信息
 const { delView } = useTagsViewStore() // 视图操作
 
 const designer = ref() // 表单设计器
+useFormCreateDesigner(designer) // 表单设计器增强
 const dialogVisible = ref(false) // 弹窗是否展示
 const formLoading = ref(false) // 表单的加载中：提交的按钮禁用
 const formData = ref({

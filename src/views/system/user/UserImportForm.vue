@@ -40,10 +40,12 @@
     </template>
   </Dialog>
 </template>
-<script lang="ts" name="SystemUserImportForm" setup>
+<script lang="ts" setup>
 import * as UserApi from '@/api/system/user'
 import { getAccessToken, getTenantId } from '@/utils/auth'
 import download from '@/utils/download'
+
+defineOptions({ name: 'SystemUserImportForm' })
 
 const message = useMessage() // 消息弹窗
 
@@ -59,6 +61,8 @@ const updateSupport = ref(0) // 是否更新已经存在的用户数据
 /** 打开弹窗 */
 const open = () => {
   dialogVisible.value = true
+  updateSupport.value = 0
+  fileList.value = []
   resetForm()
 }
 defineExpose({ open }) // 提供 open 方法，用于打开弹窗
@@ -101,6 +105,8 @@ const submitFormSuccess = (response: any) => {
     text += '< ' + username + ': ' + data.failureUsernames[username] + ' >'
   }
   message.alert(text)
+  formLoading.value = false
+  dialogVisible.value = false
   // 发送操作成功的事件
   emits('success')
 }
@@ -112,9 +118,10 @@ const submitFormError = (): void => {
 }
 
 /** 重置表单 */
-const resetForm = () => {
+const resetForm = async (): Promise<void> => {
   // 重置上传状态和文件
   formLoading.value = false
+  await nextTick()
   uploadRef.value?.clearFiles()
 }
 

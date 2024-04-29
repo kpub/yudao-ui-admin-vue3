@@ -24,15 +24,10 @@
       </el-collapse-item>
       <el-collapse-item name="condition" v-if="formVisible" key="form">
         <template #title><Icon icon="ep:list" />表单</template>
-        <!-- <element-form :id="elementId" :type="elementType" /> -->
-        友情提示：使用
-        <router-link :to="{ path: '/bpm/manager/form' }"
-          ><el-link type="danger">流程表单</el-link>
-        </router-link>
-        替代，提供更好的表单设计功能
+        <element-form :id="elementId" :type="elementType" />
       </el-collapse-item>
       <el-collapse-item name="task" v-if="elementType.indexOf('Task') !== -1" key="task">
-        <template #title><Icon icon="ep:checked" />任务</template>
+        <template #title><Icon icon="ep:checked" />任务（审批人）</template>
         <element-task :id="elementId" :type="elementType" />
       </el-collapse-item>
       <el-collapse-item
@@ -40,7 +35,7 @@
         v-if="elementType.indexOf('Task') !== -1"
         key="multiInstance"
       >
-        <template #title><Icon icon="ep:help-filled" />多实例</template>
+        <template #title><Icon icon="ep:help-filled" />多实例（会签配置）</template>
         <element-multi-instance :business-object="elementBusinessObject" :type="elementType" />
       </el-collapse-item>
       <el-collapse-item name="listeners" key="listeners">
@@ -62,7 +57,7 @@
     </el-collapse>
   </div>
 </template>
-<script setup lang="ts" name="MyPropertiesPanel">
+<script lang="ts" setup>
 import ElementBaseInfo from './base/ElementBaseInfo.vue'
 import ElementOtherConfig from './other/ElementOtherConfig.vue'
 import ElementTask from './task/ElementTask.vue'
@@ -73,6 +68,9 @@ import ElementListeners from './listeners/ElementListeners.vue'
 import ElementProperties from './properties/ElementProperties.vue'
 // import ElementForm from './form/ElementForm.vue'
 import UserTaskListeners from './listeners/UserTaskListeners.vue'
+
+defineOptions({ name: 'MyPropertiesPanel' })
+
 /**
  * 侧边栏
  * @Author MiyueFE
@@ -106,22 +104,22 @@ const elementBusinessObject = ref<any>({}) // 元素 businessObject 镜像，提
 const conditionFormVisible = ref(false) // 流转条件设置
 const formVisible = ref(false) // 表单配置
 const bpmnElement = ref()
-const timer = ref()
+
 provide('prefix', props.prefix)
 provide('width', props.width)
 const bpmnInstances = () => (window as any)?.bpmnInstances
-const initModels = () => {
-  // console.log(props, 'props')
-  // console.log(props.bpmnModeler, 'sakdjjaskdsajdkasdjkadsjk')
-  // 初始化 modeler 以及其他 moddle
-  // nextTick(() => {
-  if (!props.bpmnModeler) {
+
+// 监听 props.bpmnModeler 然后 initModels
+const unwatchBpmn = watch(
+  () => props.bpmnModeler,
+  () => {
     // 避免加载时 流程图 并未加载完成
-    timer.value = setTimeout(() => initModels(), 10)
-    return
-  }
-  if (timer.value) {
-    clearTimeout(timer.value)
+    if (!props.bpmnModeler) {
+      console.log('缺少props.bpmnModeler')
+      return
+    }
+
+    console.log('props.bpmnModeler 有值了！！！')
     const w = window as any
     w.bpmnInstances = {
       modeler: props.bpmnModeler,
@@ -134,12 +132,16 @@ const initModels = () => {
       replace: props.bpmnModeler.get('replace'),
       selection: props.bpmnModeler.get('selection')
     }
-  }
 
-  console.log(bpmnInstances(), 'window.bpmnInstances')
-  getActiveElement()
-  // })
-}
+    console.log(bpmnInstances(), 'window.bpmnInstances')
+    getActiveElement()
+    unwatchBpmn()
+  },
+  {
+    immediate: true
+  }
+)
+
 const getActiveElement = () => {
   // 初始第一个选中元素 bpmn:Process
   initFormOnChanged(null)
@@ -187,11 +189,7 @@ const initFormOnChanged = (element) => {
   )
   formVisible.value = elementType.value === 'UserTask' || elementType.value === 'StartEvent'
 }
-onMounted(() => {
-  setTimeout(() => {
-    initModels()
-  }, 100)
-})
+
 onBeforeUnmount(() => {
   const w = window as any
   w.bpmnInstances = null

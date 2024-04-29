@@ -1,4 +1,6 @@
 <template>
+  <doc-alert title="审批接入（流程表单）" url="https://doc.iocoder.cn/bpm/use-bpm-form/" />
+
   <ContentWrap>
     <!-- 搜索工作栏 -->
     <el-form
@@ -90,11 +92,13 @@
   </Dialog>
 </template>
 
-<script lang="ts" name="BpmForm" setup>
+<script lang="ts" setup>
 import { DICT_TYPE } from '@/utils/dict'
 import { dateFormatter } from '@/utils/formatTime'
 import * as FormApi from '@/api/bpm/form'
 import { setConfAndFields2 } from '@/utils/formCreate'
+
+defineOptions({ name: 'BpmForm' })
 
 const message = useMessage() // 消息弹窗
 const { t } = useI18n() // 国际化
